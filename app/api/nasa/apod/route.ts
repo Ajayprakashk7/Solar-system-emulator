@@ -1,0 +1,68 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { nasaLogger } from '@/lib/logger';
+import { env } from '@/lib/env';
+import { dateSchema } from '@/lib/validation';
+import { handleError, AppError, ERROR_CODES } from '@/lib/error-handler';
+
+const CACHE_DURATION = 24 * 60 * 60; // 24 hours in seconds
+
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const date = searchParams.get('date');
+    
+    // Validate date if provided
+    if (date) {
+      const validationResult = dateSchema.safeParse(date);
+      if (!validationResult.success) {
+        throw new AppError(
+          `Invalid date format: ${date}`,
+          ERROR_CODES.VALIDATION_ERROR,
+          400,
+          'Please provide date in YYYY-MM-DD format'
+        );
+      }
+    }
+    nasaLogger.debug(`Fetching APOD${date ? ` for date: ${date}` : ''}`);
+    
+    const apiKey = env.NASA_API_KEY;
+    const dateParam = date ? `&date=${date}` : '';
+    const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}${dateParam}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Solar-System-Emulator/1.0',
+      },
+    });
+    
+    if (!response.ok) {
+      nasaLogger.warn(`NASA APOD API error: ${response.status}`);
+      throw new AppError(
+        `NASA APOD API returned ${response.status}`,
+        ERROR_CODES.API_ERROR,
+        response.status,
+        'Failed to fetch Astronomy Picture of the Day'
+      );
+    }
+    
+    const data = await response.json();
+    
+    nasaLogger.debug('Successfully fetched APOD data');
+    
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate`,
+        'CDN-Cache-Control': `public, s-maxage=${CACHE_DURATION}`,
+      },
+    });
+  } catch (error) {
+    const appError = handleError(error, 'APOD_API');
+    return NextResponse.json(
+      { 
+        error: appError.userMessage || 'Failed to fetch APOD data',
+        code: appError.code 
+      },
+      { status: appError.statusCode }
+    );
+  }
+}

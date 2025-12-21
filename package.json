@@ -1,0 +1,43 @@
+{
+  "name": "solar-system-emulator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive 3D Solar System Emulator at solar-system.ajayprakash.dev",
+  "author": "Ajay Prakash",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix"
+  },
+  "dependencies": {
+    "@react-spring/three": "^10.0.3",
+    "@react-spring/web": "^10.0.3",
+    "@react-three/drei": "^10.4.2",
+    "@react-three/fiber": "^9.0.0",
+    "@react-three/postprocessing": "3.0.4",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
+    "framer-motion": "^12.23.0",
+    "lru-cache": "^11.0.2",
+    "lucide-react": "^0.525.0",
+    "next": "^15.3.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "three": "^0.177.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.177.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^15.3.4",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.0"
+  }
+}
